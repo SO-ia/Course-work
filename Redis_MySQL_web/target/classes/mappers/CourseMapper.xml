@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.redis_mysql_web.mapper.CourseMapper">
+
+    <!--
+        1.SQL语句带一个参数
+        parameterType：指定接收参数类型，返回一条记录，用下标取参数
+        parameterType：参数类型
+     -->
+    <select id="findCourseByNumber" resultType="Course" parameterType="String">
+        SELECT * FROM course_information WHERE course_number=#{course_number}
+    </select>
+
+    <update id="updateCourseByNumber">
+        UPDATE course_information set course_name=#{course_name},course_opening_semester=#{course_opening_semester} ,course_department=#{course_department} where course_number=#{course_number}
+    </update>
+
+    <insert id="addCourse" parameterType="Course">
+        INSERT INTO course_information SET course_name=#{course_name},course_opening_semester=#{course_opening_semester},course_department=#{course_department},course_number=#{course_number}
+    </insert>
+
+</mapper>

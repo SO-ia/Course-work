@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta course_name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Information</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Grade Information Form</h1>
+<div class="container">
+    <!-- Insert Course Form -->
+    <h2>插入新成绩信息</h2>
+    <div class="form-group">
+        <label for="course_number">课程编号:</label>
+        <input type="text" id="course_number" placeholder="Enter course number(e.g. CSE102)">
+    </div>
+    <div class="form-group">
+        <label for="student_number">学生学号:</label>
+        <input type="text" id="student_number" placeholder="Enter student's number(e.g. S10003)">
+    </div>
+    <div class="form-group">
+        <label for="grade">成绩:</label>
+        <input type="text" id="grade" placeholder="Enter course's grade(e.g. 89.0)">
+    </div>
+    <div class="form-group">
+        <button id="submitButton">确认</button>
+    </div>
+
+    <!-- View Course Form -->
+    <h2>查看学生成绩信息</h2>
+    <div class="form-group">
+        <label for="view_course_number">输入课程编号:</label>
+        <input type="text" id="view_course_number" placeholder="Enter course number to view(e.g. C102)">
+    </div>
+    <div class="form-group">
+        <label for="view_student_number">输入学生学号:</label>
+        <input type="text" id="view_student_number" placeholder="Enter student number(e.g. S10003)">
+    </div>
+    <div class="form-group">
+        <button id="viewButton">确认</button>
+    </div>
+
+    <!-- Update Course Form -->
+    <h2>更新学生成绩信息</h2>
+    <div class="form-group">
+        <label for="update_course_number">课程编号:</label>
+        <input type="text" id="update_course_number" placeholder="Enter course number to update(e.g. C102)">
+    </div>
+    <div class="form-group">
+        <label for="update_student_number">学生学号:</label>
+        <input type="text" id="update_student_number" placeholder="Enter student number(e.g. S10003)">
+    </div>
+    <div class="form-group">
+        <label for="update_grade">更新成绩:</label>
+        <input type="text" id="update_grade" placeholder="Enter grade">
+    </div>
+    <div class="form-group">
+        <button id="updateButton">确认</button>
+    </div>
+
+    <div class="response" id="responseContainer">
+        <!-- The server response will be displayed here -->
+    </div>
+</div>
+
+<script>
+    // Insert Course (Insert Grade)
+    $("#submitButton").on("click", function() {
+        var student_number = $("#student_number").val();
+        var grade = $("#grade").val();  // 获取输入的成绩
+        var course_number = $("#course_number").val();
+
+        // 验证输入字段是否为空
+        if (student_number === "" || course_number === "" || grade === "") {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        // 确保成绩是有效的 double 类型
+        var parsedGrade = parseFloat(grade);
+        if (isNaN(parsedGrade)) {
+            alert("Please enter a valid grade.");
+            return;
+        }
+
+        var newGrade = {
+            student_number: student_number,
+            grade: parsedGrade,  // 将成绩转换为 double 类型
+            course_number: course_number
+        };
+
+        $.ajax({
+            url: "http://localhost:8080/insertGradeHtmlInfo",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(newGrade),
+            success: function(response) {
+                if (response) {
+                    // 显示成绩信息
+                    var gradeInfo = `<strong>Grade Info:</strong><br>
+                        Course Number: ${response.course_number}<br>
+                        Course Name: ${response.course_name}<br>
+                        Student Number: ${response.student_number}<br>
+                        Student Name: ${response.student_name}<br>
+                        Grade: ${response.grade}`;
+                    $("#responseContainer").html(gradeInfo);
+                } else {
+                    $("#responseContainer").html("<strong>Error:</strong> Grade not found.");
+                }
+            },
+            error: function(error) {
+                $("#responseContainer").html("<strong>Error:</strong> Something went wrong. Please try again.");
+            }
+        });
+    });
+
+    // View Grade Info
+    $("#viewButton").on("click", function() {
+        var course_number = $("#view_course_number").val();
+        var student_number = $("#view_student_number").val();
+
+        if (course_number === "") {
+            alert("Please enter a course number.");
+            return;
+        }
+
+        $.ajax({
+            url: "http://localhost:8080/findGradeByNumber/" + student_number + "/" + course_number,
+            type: "GET",
+            success: function(response) {
+                if (response) {
+                    // 显示成绩信息
+                    var gradeInfo = `<strong>Grade Info:</strong><br>
+                        Course Number: ${response.course_number}<br>
+                        Course Name: ${response.course_name}<br>
+                        Student Number: ${response.student_number}<br>
+                        Student Name: ${response.student_name}<br>
+                        Grade: ${response.grade}`;
+                    $("#responseContainer").html(gradeInfo);
+                } else {
+                    $("#responseContainer").html("<strong>Error:</strong> Grade not found.");
+                }
+            },
+            error: function(error) {
+                $("#responseContainer").html("<strong>Error:</strong> Grade not found.");
+            }
+        });
+    });
+
+    // Update Grade Info
+    $("#updateButton").on("click", function() {
+        var student_number = $("#update_student_number").val();
+        var grade = $("#update_grade").val();
+        var course_number = $("#update_course_number").val();
+
+        if (course_number === "" || student_number === "" || grade === "") {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        // 确保成绩是有效的 double 类型
+        var parsedGrade = parseFloat(grade);
+        if (isNaN(parsedGrade)) {
+            alert("Please enter a valid grade.");
+            return;
+        }
+
+        var updatedGrade = {
+            course_number: course_number,
+            student_number: student_number,
+            grade: parsedGrade  // 将成绩转换为 double 类型
+        };
+
+        $.ajax({
+            url: "http://localhost:8080/updateGradeHtmlByNumber/" + student_number + "/" + course_number,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(updatedGrade),
+            success: function(response) {
+                if (response) {
+                    alert("ok");
+                    // 显示成绩信息
+                    var gradeInfo = `<strong>Grade Info:</strong><br>
+                        Course Number: ${response.course_number}<br>
+                        Course Name: ${response.course_name}<br>
+                        Student Number: ${response.student_number}<br>
+                        Student Name: ${response.student_name}<br>
+                        Grade: ${response.grade}`;
+                    $("#responseContainer").html(gradeInfo);
+                } else {
+                    $("#responseContainer").html("<strong>Error:</strong> Grade not found.");
+                }
+            },
+            error: function(error) {
+                $("#responseContainer").html("<strong>Error:</strong> Could not update the Grade.");
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

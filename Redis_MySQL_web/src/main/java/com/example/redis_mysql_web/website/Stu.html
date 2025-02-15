@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Information</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Student Information Form</h1>
+<div class="container">
+    <!-- Insert Student Form -->
+    <h2>插入新学生信息</h2>
+    <div class="form-group">
+        <label for="name">姓名:</label>
+        <input type="text" id="name" placeholder="Enter student's name">
+    </div>
+
+    <div class="form-group">
+        <label for="gender">性别:</label>
+        <input type="text" id="gender" placeholder="Enter student's gender (M/F)">
+    </div>
+
+    <div class="form-group">
+        <label for="student_number">学号:</label>
+        <input type="text" id="student_number" placeholder="Enter student number">
+    </div>
+
+    <div class="form-group">
+        <button id="submitButton">确认</button>
+    </div>
+
+    <!-- View Student Form -->
+    <h2>查看学生信息</h2>
+    <div class="form-group">
+        <label for="view_student_number">输入学号:</label>
+        <input type="text" id="view_student_number" placeholder="Enter student number to view">
+    </div>
+
+    <div class="form-group">
+        <button id="viewButton">确认</button>
+    </div>
+
+    <!-- Update Student Form -->
+    <h2>更新学生信息</h2>
+    <div class="form-group">
+        <label for="update_name">姓名:</label>
+        <input type="text" id="update_name" placeholder="Enter student's name">
+    </div>
+
+    <div class="form-group">
+        <label for="update_gender">性别:</label>
+        <input type="text" id="update_gender" placeholder="Enter student's gender (M/F)">
+    </div>
+
+    <div class="form-group">
+        <label for="update_student_number">学号:</label>
+        <input type="text" id="update_student_number" placeholder="Enter student number to update">
+    </div>
+
+    <div class="form-group">
+        <button id="updateButton">确认</button>
+    </div>
+
+    <div class="response" id="responseContainer">
+        <!-- The server response will be displayed here -->
+    </div>
+</div>
+
+<script>
+    // Insert Student
+    $("#submitButton").on("click", function() {
+        var name = $("#name").val();
+        var gender = $("#gender").val();
+        var studentNumber = $("#student_number").val();
+
+        if (name === "" || gender === "" || studentNumber === "") {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        var newStudent = {
+            name: name,
+            gender: gender,
+            student_number: studentNumber
+        };
+
+        $.ajax({
+            url: "http://localhost:8080/insertStuHtmlInfo",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(newStudent),
+            success: function(response) {
+                if (response) {
+                    // Display student information if found
+                    var studentInfo = `<strong>Student Info:</strong><br>
+                        Student Number: ${response.student_number}<br>
+                        Name: ${response.name}<br>
+                        Gender: ${response.gender}`;
+                    $("#responseContainer").html(studentInfo);
+                } else {
+                    $("#responseContainer").html("<strong>Error:</strong> Student not found.");
+                }
+            },
+            error: function(error) {
+                $("#responseContainer").html("<strong>Error:</strong> Something went wrong. Please try again.");
+            }
+        });
+    });
+
+    // View Student Info
+    $("#viewButton").on("click", function() {
+        var studentNumber = $("#view_student_number").val();
+
+        if (studentNumber === "") {
+            alert("Please enter a student number.");
+            return;
+        }
+
+        $.ajax({
+            url: "http://localhost:8080/findStuByNumber/" + studentNumber,
+            type: "GET",
+            success: function(response) {
+                if (response) {
+                    // Display student information if found
+                    var studentInfo = `<strong>Student Info:</strong><br>
+                        Student Number: ${response.student_number}<br>
+                        Name: ${response.name}<br>
+                        Gender: ${response.gender}`;
+                    $("#responseContainer").html(studentInfo);
+                } else {
+                    $("#responseContainer").html("<strong>Error:</strong> Student not found.");
+                }
+            },
+            error: function(error) {
+                $("#responseContainer").html("<strong>Error:</strong> Student not found.");
+            }
+        });
+    });
+
+    // Update Student Info
+    $("#updateButton").on("click", function() {
+        var studentNumber = $("#update_student_number").val();
+        var name = $("#update_name").val();
+        var gender = $("#update_gender").val();
+
+        if (studentNumber === "" || name === "" || gender === "") {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        var updatedStudent = {
+            number: studentNumber,
+            name: name,
+            gender: gender
+        };
+
+        $.ajax({
+            url: "http://localhost:8080/updateStuHtmlByNumber/" + studentNumber,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(updatedStudent),
+            success: function(response) {
+                if (response) {
+                    // Display student information if found
+                    var studentInfo = `<strong>Student Info:</strong><br>
+                        Student Number: ${response.student_number}<br>
+                        Name: ${response.name}<br>
+                        Gender: ${response.gender}`;
+                    $("#responseContainer").html(studentInfo);
+                } else {
+                    $("#responseContainer").html("<strong>Error:</strong> Student not found.");
+                }            },
+            error: function(error) {
+                $("#responseContainer").html("<strong>Error:</strong> Could not update the student.");
+            }
+        });
+    });
+</script>
+</body>
+</html>

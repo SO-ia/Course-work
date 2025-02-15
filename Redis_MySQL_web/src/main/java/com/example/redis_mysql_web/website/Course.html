@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta course_name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Information</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Course Information Form</h1>
+<div class="container">
+    <!-- Insert Course Form -->
+    <h2>插入新课程信息</h2>
+    <div class="form-group">
+        <label for="course_name">课程名称:</label>
+        <input type="text" id="course_name" placeholder="Enter course's name(e.g. 计算机科学导论)">
+    </div>
+
+    <div class="form-group">
+        <label for="opening_semester">开课学期:</label>
+        <input type="text" id="opening_semester" placeholder="Enter course's opening semester(e.g. Spring 2025)">
+    </div>
+
+    <div class="form-group">
+        <label for="department">开课系:</label>
+        <input type="text" id="department" placeholder="Enter course's department(e.g. Computer Science/计算机系)">
+    </div>
+    
+    <div class="form-group">
+        <label for="course_number">课程编号:</label>
+        <input type="text" id="course_number" placeholder="Enter course number(e.g. CSE202)">
+    </div>
+
+    <div class="form-group">
+        <button id="submitButton">确认</button>
+    </div>
+
+    <!-- View Course Form -->
+    <h2>查看课程信息</h2>
+    <div class="form-group">
+        <label for="view_course_number">输入课程编号:</label>
+        <input type="text" id="view_course_number" placeholder="Enter course number to view(e.g. CSE202)">
+    </div>
+
+    <div class="form-group">
+        <button id="viewButton">确认</button>
+    </div>
+
+    <!-- Update Course Form -->
+    <h2>更新课程信息</h2>
+    <div class="form-group">
+        <label for="update_course_number">新课程编号:</label>
+        <input type="text" id="update_course_number" placeholder="Enter course number to update">
+    </div>
+
+    <div class="form-group">
+        <label for="update_name">新课程名称:</label>
+        <input type="text" id="update_name" placeholder="Enter course's course_name">
+    </div>
+
+    <div class="form-group">
+        <label for="update_opening_semester">新开课学期:</label>
+        <input type="text" id="update_opening_semester" placeholder="Enter course's opening_semester">
+    </div>
+
+    <div class="form-group">
+        <label for="update_department">新开课系:</label>
+        <input type="text" id="update_department" placeholder="Enter course's department">
+    </div>
+
+    <div class="form-group">
+        <button id="updateButton">确认</button>
+    </div>
+
+    <div class="response" id="responseContainer">
+        <!-- The server response will be displayed here -->
+    </div>
+</div>
+
+<script>
+    // Insert Course
+    $("#submitButton").on("click", function() {
+        var course_name = $("#course_name").val();
+        var opening_semester = $("#opening_semester").val();
+        var department = $("#department").val();
+        var course_number = $("#course_number").val();
+
+        if (course_name === "" || opening_semester === "" || course_number === "" || department === "") {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        var newCourse = {
+            course_name: course_name,
+            course_opening_semester: opening_semester,
+            course_department: department,
+            course_number: course_number
+        };
+
+        $.ajax({
+            url: "http://localhost:8080/insertCourseHtmlInfo",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(newCourse),
+            success: function(response) {
+                if (response) {
+                    // Display student information if found
+                    var courseInfo = `<strong>Course Info:</strong><br>
+                        Course Number: ${response.course_number}<br>
+                        Name: ${response.course_name}<br>
+                        Department: ${response.course_department}<br>
+                        Opening semester: ${response.course_opening_semester}`;
+                    $("#responseContainer").html(courseInfo);
+                } else {
+                    $("#responseContainer").html("<strong>Error:</strong> Course not found.");
+                }            },
+            error: function(error) {
+                $("#responseContainer").html("<strong>Error:</strong> Something went wrong. Please try again.");
+            }
+        });
+    });
+
+    // View Course Info
+    $("#viewButton").on("click", function() {
+        var course_number = $("#view_course_number").val();
+
+        if (course_number === "") {
+            alert("Please enter a course number.");
+            return;
+        }
+
+        $.ajax({
+            url: "http://localhost:8080/findCourseByNumber/" + course_number,
+            type: "GET",
+            success: function(response) {
+                if (response) {
+                    // Display student information if found
+                    var courseInfo = `<strong>Course Info:</strong><br>
+                        Course Number: ${response.course_number}<br>
+                        Name: ${response.course_name}<br>
+                        Department: ${response.course_department}<br>
+                        Opening semester: ${response.course_opening_semester}`;
+                    $("#responseContainer").html(courseInfo);
+                } else {
+                    $("#responseContainer").html("<strong>Error:</strong> Course not found.");
+                }
+            },
+            error: function(error) {
+                $("#responseContainer").html("<strong>Error:</strong> Course not found.");
+            }
+        });
+    });
+
+    // Update Course Info
+    $("#updateButton").on("click", function() {
+        var course_name = $("#update_name").val();
+        var opening_semester = $("#update_opening_semester").val();
+        var department = $("#update_department").val();
+        var course_number = $("#update_course_number").val();
+
+        if (course_number === "" || course_name === "" || opening_semester === "" || department === "" ) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        var updatedCourse = {
+            number: course_number,
+            course_name: course_name,
+            course_opening_semester: opening_semester,
+            course_department: department
+        };
+
+        $.ajax({
+            url: "http://localhost:8080/updateCourseHtmlByNumber/" + course_number,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(updatedCourse),
+            success: function(response) {
+                if (response) {
+                    // Display student information if found
+                    var courseInfo = `<strong>Course Info:</strong><br>
+                        Course Number: ${response.course_number}<br>
+                        Name: ${response.course_name}<br>
+                        Department: ${response.course_department}<br>
+                        Opening semester: ${response.course_opening_semester}`;
+                    $("#responseContainer").html(courseInfo);
+                } else {
+                    $("#responseContainer").html("<strong>Error:</strong> Course not found.");
+                }
+                // $("#responseContainer").html("<strong>Update Response:</strong> " + response);
+            },
+            error: function(error) {
+                $("#responseContainer").html("<strong>Error:</strong> Could not update the course.");
+            }
+        });
+    });
+</script>
+</body>
+</html>

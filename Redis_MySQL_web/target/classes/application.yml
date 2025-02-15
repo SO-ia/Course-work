@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql:///stu?serverTimezone=Hongkong?characterEncoding=utf8&serverTimezone=GMT%2B8
+    username: root
+    password: root
+  data:
+    redis:
+      cluster:
+        nodes:
+          - 192.168.178.23:6380
+          - 192.168.178.23:6381
+          - 192.168.178.23:6382
+          - 192.168.178.23:6383
+          - 192.168.178.23:6384
+          - 192.168.178.23:6385
+        max-redirects: 5
+
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 10
+          min-idle: 1
+          max-wait: -1ms
+        cluster:
+          # 使集群拓扑自适应刷新，默认值：false
+          # 集群出现故障，进行故障转移，产生新的主节点后，
+          # 程序端通过该配置可以感知到新的节点
+          refresh:
+            adaptive: true
+            period: 6000    # 集群拓扑定时刷新周期，Unit：毫秒
+            dynamic-refresh-sources: true #发现并查询所有 Redis 集群节点集群拓扑信息
+  mvc:
+    servlet:
+      load-on-startup: 1
+
+
+
+
+mybatis:
+  #  mapper-locations: classpath:com/example/mapper/*.xml    #指定sql配置文件的位置
+  mapper-locations: classpath:mappers/*.xml
+  type-aliases-package: com.example.redis_mysql_web.pojo      #指定实体类所在的包名
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl   #输出SQL命令
+

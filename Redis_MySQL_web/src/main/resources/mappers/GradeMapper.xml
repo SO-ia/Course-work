@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.redis_mysql_web.mapper.GradeMapper">
+    <select id="findGradeByNumber" resultType="Grade" parameterType="String">
+        SELECT
+            sg.student_number,
+            sg.course_number,
+            sg.grade_number,
+            sg.grade,
+            s.name AS student_name,
+            c.course_name
+        FROM student_grades sg
+                 JOIN students s ON sg.student_number = s.student_number
+                 JOIN course_information c ON sg.course_number = c.course_number
+        WHERE sg.student_number = SUBSTRING_INDEX(#{grade_number}, ':', 1)  -- 提取 student_number
+          AND sg.course_number = SUBSTRING_INDEX(#{grade_number}, ':', -1)  -- 提取 course_number
+    </select>
+
+    <update id="updateGradeByNumber">
+        UPDATE student_grades
+        SET grade = #{grade}
+        WHERE student_number = #{student_number} AND course_number = #{course_number}
+    </update>
+
+    <insert id="addGrade" parameterType="Grade">
+        INSERT INTO student_grades (student_number, course_number, grade)
+        VALUES (#{student_number}, #{course_number}, #{grade})
+    </insert>
+</mapper>
+

@@ -1,0 +1,20 @@
+1.创建并启动容器
+docker run -id --name redis_6380  -p 6380:6380 -p 16380:16380   --privileged=true -v /d/A_APP/redis/03_conf_cluster/data/6380:/data  -v /d/A_APP/redis/03_conf_cluster:/etc/redis redis redis-server /etc/redis/redis-6380.conf 
+docker run -id --name redis_6381  -p 6381:6381 -p 16381:16381   --privileged=true -v /d/A_APP/redis/03_conf_cluster/data/6381:/data  -v /d/A_APP/redis/03_conf_cluster:/etc/redis redis redis-server /etc/redis/redis-6381.conf 
+docker run -id --name redis_6382  -p 6382:6382 -p 16382:16382   --privileged=true -v /d/A_APP/redis/03_conf_cluster/data/6382:/data  -v /d/A_APP/redis/03_conf_cluster:/etc/redis redis redis-server /etc/redis/redis-6382.conf 
+docker run -id --name redis_6383  -p 6383:6383 -p 16383:16383   --privileged=true -v /d/A_APP/redis/03_conf_cluster:/etc/redis redis redis-server /etc/redis/redis-6383.conf 
+docker run -id --name redis_6384  -p 6384:6384 -p 16384:16384   --privileged=true -v /d/A_APP/redis/03_conf_cluster:/etc/redis redis redis-server /etc/redis/redis-6384.conf 
+docker run -id --name redis_6385  -p 6385:6385 -p 16385:16385   --privileged=true -v /d/A_APP/redis/03_conf_cluster:/etc/redis redis redis-server /etc/redis/redis-6385.conf 
+
+
+2.进入到某个容器内
+docker exec -it redis_6380 /bin/bash
+
+3.创建集群
+
+redis-cli --cluster create 10.173.79.157:6380 10.173.79.157:6381 10.173.79.157:6382 10.173.79.157:6383 10.173.79.157:6384  10.173.79.157:6385  --cluster-replicas 1
+
+redis-cli --cluster create 192.168.178.23:6380 192.168.178.23:6381 192.168.178.23:6382 192.168.178.23:6383 192.168.178.23:6384  192.168.178.23:6385  --cluster-replicas 1
+
+4.查询集群状态
+redis-cli -p 6380  cluster nodes

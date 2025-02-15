@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.redis_mysql_web.mapper.StuMapper">
+
+    <!--
+        1.SQL语句带一个参数
+        parameterType：指定接收参数类型，返回一条记录，用下标取参数
+        parameterType：参数类型
+     -->
+    <select id="findStuByNumber" resultType="Stu" parameterType="String">
+        SELECT * FROM students WHERE student_number=#{number}
+    </select>
+
+    <update id="updateStuByNumber">
+        UPDATE students set name=#{name},gender=#{gender} where student_number=#{student_number}
+    </update>
+
+    <insert id="addStu" parameterType="Stu">
+        <selectKey keyProperty="student_id" order="AFTER" resultType="int">
+            select LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO students SET name=#{name},gender=#{gender},student_number=#{student_number}
+    </insert>
+
+</mapper>
