@@ -22,12 +22,19 @@ tqdm==4.66.4
 ```
 
 PaddlePaddle：深度学习框架，用于构建和训练模型。
+
 NumPy：用于数值计算。
+
 Pandas：用于数据处理和CSV文件操作。
+
 OpenCV（cv2）：用于图像处理。
+
 imgaug：用于图像数据增强。
+
 Matplotlib：用于数据可视化。
+
 scikit-learn：用于计算分类报告和其他机器学习工具。
+
 PIL（Python Imaging Library）：用于图像处理。
 
 
@@ -104,8 +111,11 @@ cnn_paddle_final
 ### 代码主要功能
 
 模型构建：在CNN_face.py和CNN_ResNet.py中定义了两个神经网络模型结构，分别用于构建标准的CNN和ResNet模型。
+
 数据预处理：cnn_picture_label.py用于数据集的划分和标签生成，img_zeng.py用于数据增强，rewrite_dataset.py中的FaceDataset类用于加载和预处理数据。
+
 模型训练与验证：train.py负责模型的训练和验证，并保存最佳模型参数。model_valid.py用于加载训练好的模型，并在测试集上进行验证和预测。
+
 数据可视化：使用matplotlib库在model_valid.py中可视化混淆矩阵。
 
 
@@ -121,18 +131,27 @@ cnn_paddle_final
    ```
 
 2. 数据准备：
+   
    使用cnn_picture_label.py脚本将数据集中的图片按类别划分，并生成训练集、验证集和测试集的标签。
+   
    使用img_zeng.py脚本对数据集中的图像进行数据增强。
+   
    使用cnn_picture_to_csv.py脚本将图像数据转换为CSV文件。
 
-2. 模型训练：
+4. 模型训练：
+   
    运行train.py脚本，训练CNN模型，并在每个epoch后评估模型性能，保存最佳模型参数。
+   
    运行train_ResNet.py脚本，训练ResNet模型，并在每个epoch后评估模型性能，保存最佳模型参数。
 
-3. 模型验证：
+6. 模型验证：
+   
    使用model_valid.py脚本加载训练好的CNN模型，并在测试集上进行验证和预测，输出分类报告和可视化混淆矩阵。
+   
    使用model_valid_ResNet.py脚本加载训练好的ResNet模型，并在测试集上进行验证和预测，输出分类报告和可视化混淆矩阵。
 
-4. 结果分析：
+8. 结果分析：
+   
    分析model_valid.py脚本输出CNN模型的分类报告和混淆矩阵，评估模型性能
+   
    分析model_valid_ResNet.py脚本输出ResNet模型的分类报告和混淆矩阵，评估模型性能
