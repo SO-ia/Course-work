@@ -35,7 +35,7 @@ PIL（Python Imaging Library）：用于图像处理。
 ### 项目结构
 
 ```python
-D:
+cnn_paddle_final
 │  img_zeng.py
 │  model_valid_cnn.py
 │  model_valid_ResNet.py
